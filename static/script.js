@@ -248,3 +248,10 @@ document.getElementById('chat-input').addEventListener('keypress', (e) => {
 });
 
 loadCases();
+
+function enterMainMenu() {
+    // Hide the home screen
+    document.getElementById('home-modal').style.display = 'none';
+    // Show the case selection screen
+    document.getElementById('main-menu').style.display = 'flex';
+}
