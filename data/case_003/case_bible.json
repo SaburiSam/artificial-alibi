@@ -15,7 +15,7 @@
       "Karan (Son): Om Prakash refused to pay off Karan's gambling debts."
     ]
   },
-  "solution": { "murderer_id": "rashid", "required_evidence": ["fake_crane_log", "bank_transfer"], "logical_rule": "Rashid's alibi fails when the fake crane log and the bank transfer are found." },
+  "solution": { "murderer_id": "rashid", "required_evidence": ["fake_crane_log", "bank_transfer", "camera_feed", "confession"], "logical_rule": "Rashid's alibi fails when the log, transfer, and camera feed are found." },
   "suspects": [
     { "id": "rashid", "name": "Rashid Khan", "role": "Site Manager", "motive": "Om was going to frame him.", "secret": "He rigged the crane.", "initial_trust": 65, "initial_suspicion": 30, "alibi": "Claims he was in the office.", "relationships": "You hate Om. You despise Sanjay." },
     { "id": "sanjay", "name": "Sanjay Gupta", "role": "Business Partner", "motive": "Om was stealing.", "secret": "He moved money offshore.", "initial_trust": 70, "initial_suspicion": 25, "alibi": "Claims he was at a golf game.", "relationships": "You think Rashid is uneducated. You hate Om." },
@@ -24,9 +24,12 @@
   ],
   "evidence": [
     { "id": "fake_crane_log", "name": "Fake Crane Log", "description": "Shows the crane was operated manually.", "unlock_condition": { "type": "default", "value": true } },
-    { "id": "bank_transfer", "name": "Offshore Transfer", "description": "Proof of Rashid transferring money.", "unlock_condition": { "type": "suspect_contradiction", "suspect_id": "rashid", "requires_evidence": ["fake_crane_log"] } }
+    { "id": "bank_transfer", "name": "Offshore Transfer", "description": "Proof of Rashid transferring money.", "unlock_condition": { "type": "suspect_contradiction", "suspect_id": "rashid", "requires_evidence": ["fake_crane_log"] } },
+    { "id": "camera_feed", "name": "Security Camera Feed", "description": "Shows Rashid near the crane controls at 17:55.", "unlock_condition": { "type": "suspect_contradiction", "suspect_id": "karan", "requires_evidence": [] } },
+    { "id": "confession", "name": "Signed Confession", "description": "A full breakdown and confession from the killer.", "unlock_condition": { "type": "default", "value": false } }
   ],
   "contradictions": [
-    { "id": "contra_rashid_01", "suspect_id": "rashid", "statement_key": "in_office", "player_must_say": ["crane", "log", "office", "block"], "conflicts_with_evidence": "bank_transfer", "unlocks_evidence": "bank_transfer", "trust_delta": -20, "suspicion_delta": 30 }
+    { "id": "contra_rashid_01", "suspect_id": "rashid", "statement_key": "in_office", "player_must_say": ["crane", "log", "office", "block"], "conflicts_with_evidence": "bank_transfer", "unlocks_evidence": "bank_transfer", "trust_delta": -20, "suspicion_delta": 30 },
+    { "id": "contra_karan_01", "suspect_id": "karan", "statement_key": "at_club", "player_must_say": ["camera", "feed", "club", "video"], "conflicts_with_evidence": "camera_feed", "unlocks_evidence": "camera_feed", "trust_delta": -15, "suspicion_delta": 25 }
   ]
 }
