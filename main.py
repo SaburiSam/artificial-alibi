@@ -34,25 +34,23 @@ CASE_BIBLE = ALL_CASES[ACTIVE_CASE_ID]
 def reset_game_state(case_id):
     global ACTIVE_CASE_ID, CASE_BIBLE, GAME_STATE
     ACTIVE_CASE_ID = case_id
-    CASE_BIBLE = ALL_CASES[case_id]
-
+    CASE_BIBLE = ALL_CASES[case_id] # Updates the active case
+    
     GAME_STATE = {
         "case_id": CASE_BIBLE["case_id"],
         "title": CASE_BIBLE["title"],
         "unlocked_evidence": [],
-        "suspect_status": {s["id"]: {"trust": s["initial_trust"], "suspicion": s["initial_suspicion"]} for s in
-                           CASE_BIBLE["suspects"]},
+        "suspect_status": {s["id"]: {"trust": s["initial_trust"], "suspicion": s["initial_suspicion"]} for s in CASE_BIBLE["suspects"]},
         "game_over": False,
         "player_won": False,
-        "chat_log": [],  # <-- ADD THIS (for the UI)
-        "suspect_chats": {}  # <-- ADD THIS (for the AI's memory)
+        "chat_log": [],
+        "suspect_chats": {}
     }
-
+    
     # Auto-unlock evidence with "default" conditions
     for ev in CASE_BIBLE["evidence"]:
         if ev["unlock_condition"]["type"] == "default" and ev["unlock_condition"]["value"]:
             GAME_STATE["unlocked_evidence"].append(ev["id"])
-
 
 # Initialize the default game state
 reset_game_state(ACTIVE_CASE_ID)
