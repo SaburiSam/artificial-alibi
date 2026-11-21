@@ -1,0 +1,32 @@
+{
+  "case_id": "case_001",
+  "title": "Startup Sabotage",
+  "difficulty": "easy",
+  "case_summary": "Aarav Sharma, the charismatic CEO of a billion-dollar Bangalore tech startup, was found dead in his office at 22:30. He was electrocuted by a modified server rack. The startup was days away from a massive IPO, and the pressure had turned the founding team into enemies. There was no forced entry, meaning the killer is one of the four people who stayed late that night.",
+  "victim": {
+    "name": "Aarav Sharma",
+    "time_of_death": "22:30",
+    "location": "Server Room, TechNova HQ, Bangalore",
+    "background": "A ruthless CEO who often stole credit for his team's work and was facing a massive lawsuit.",
+    "victim_relationships": [
+      "Priya (CTO): Aarav stole her code and was planning to fire her.",
+      "Vikram (Investor): Aarav discovered Vikram was embezzling and was going to expose him.",
+      "Rohan (HR): Aarav forced Rohan to bury a harassment lawsuit.",
+      "Ananya (Assistant): Aarav ruined her career after she rejected him."
+    ]
+  },
+  "solution": { "murderer_id": "priya", "required_evidence": ["modified_server", "lawsuit_draft"], "logical_rule": "Priya's alibi fails when the modified server and the lawsuit draft are found." },
+  "suspects": [
+    { "id": "priya", "name": "Priya Patel", "role": "CTO & Co-founder", "motive": "Aarav stole her code.", "secret": "She modified the server.", "initial_trust": 75, "initial_suspicion": 20, "alibi": "Claims she was in the conference room.", "relationships": "You hate Vikram because he's a loyal dog. You pity Rohan." },
+    { "id": "vikram", "name": "Vikram Singh", "role": "Investor", "motive": "Aarav was about to expose his embezzlement.", "secret": "He was shredding documents.", "initial_trust": 60, "initial_suspicion": 30, "alibi": "Claims he left at 20:00.", "relationships": "You despise Priya. You think Rohan is useless." },
+    { "id": "rohan", "name": "Rohan Das", "role": "Head of HR", "motive": "Aarav forced him to bury a lawsuit.", "secret": "He kept the lawsuit draft.", "initial_trust": 80, "initial_suspicion": 15, "alibi": "Claims he was in his office.", "relationships": "You are terrified of Aarav. You look up to Priya." },
+    { "id": "ananya", "name": "Ananya Rao", "role": "Executive Assistant", "motive": "Aarav ruined her career.", "secret": "She saw Priya in the server room.", "initial_trust": 85, "initial_suspicion": 10, "alibi": "Claims she was at the front desk.", "relationships": "You hate Aarav. You are friends with Priya." }
+  ],
+  "evidence": [
+    { "id": "modified_server", "name": "Modified Server", "description": "Tampered to cause an electrical surge.", "unlock_condition": { "type": "default", "value": true } },
+    { "id": "lawsuit_draft", "name": "Lawsuit Draft", "description": "A hidden draft of a harassment lawsuit.", "unlock_condition": { "type": "suspect_contradiction", "suspect_id": "priya", "requires_evidence": ["modified_server"] } }
+  ],
+  "contradictions": [
+    { "id": "contra_priya_01", "suspect_id": "priya", "statement_key": "on_call", "player_must_say": ["server", "conference room", "code"], "conflicts_with_evidence": "lawsuit_draft", "unlocks_evidence": "lawsuit_draft", "trust_delta": -20, "suspicion_delta": 30 }
+  ]
+}

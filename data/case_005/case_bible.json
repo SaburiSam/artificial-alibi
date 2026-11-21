@@ -1,0 +1,32 @@
+{
+  "case_id": "case_005",
+  "title": "The Shatabdi Express",
+  "difficulty": "hard",
+  "case_summary": "Business tycoon Rajiv Malhotra was found strangled in his First Class cabin on the Delhi-Bhopal Shatabdi Express at 01:00. The train doors were locked, and the lights in the corridor were off. His briefcase of cash is missing.",
+  "victim": {
+    "name": "Rajiv Malhotra",
+    "time_of_death": "01:00",
+    "location": "First Class Cabin, Shatabdi Express",
+    "background": "A ruthless businessman who destroyed local industries and bribed his way out of prison.",
+    "victim_relationships": [
+      "Seema (Ex-Wife): Rajiv cheated her out of her family's wealth.",
+      "Rathore (Inspector): Rajiv got him suspended for refusing a bribe.",
+      "Vikram (Rival): Rajiv was about to buy out his company.",
+      "Tania (Journalist): Rajiv was suing her for defamation."
+    ]
+  },
+  "solution": { "murderer_id": "seema", "required_evidence": ["silk_tie", "cash_briefcase"], "logical_rule": "Seema's alibi fails when the silk tie and the missing briefcase are found." },
+  "suspects": [
+    { "id": "seema", "name": "Seema Malhotra", "role": "Ex-Wife", "motive": "Rajiv cheated her.", "secret": "She strangled him.", "initial_trust": 70, "initial_suspicion": 25, "alibi": "Claims she was asleep.", "relationships": "You hate Rajiv. You think Rathore is incompetent." },
+    { "id": "rathore", "name": "Inspector Rathore", "role": "Police Officer", "motive": "Rajiv ruined his career.", "secret": "He was stalking Rajiv.", "initial_trust": 80, "initial_suspicion": 15, "alibi": "Claims he was patrolling.", "relationships": "You hate corruption. You suspect everyone." },
+    { "id": "vikram", "name": "Vikram Kapoor", "role": "Business Rival", "motive": "Rajiv was buying his company.", "secret": "He tried to steal the briefcase.", "initial_trust": 65, "initial_suspicion": 30, "alibi": "Claims he was in the dining car.", "relationships": "You despise Rajiv. You respect Seema." },
+    { "id": "tania", "name": "Tania Singh", "role": "Journalist", "motive": "Rajiv was suing her.", "secret": "She was recording his deals.", "initial_trust": 75, "initial_suspicion": 20, "alibi": "Claims she was reading.", "relationships": "You want justice. You think Vikram is a thief." }
+  ],
+  "evidence": [
+    { "id": "silk_tie", "name": "Silk Tie", "description": "Rajiv's tie, used as the murder weapon.", "unlock_condition": { "type": "default", "value": true } },
+    { "id": "cash_briefcase", "name": "Missing Briefcase", "description": "Found hidden inside Seema's luggage.", "unlock_condition": { "type": "suspect_contradiction", "suspect_id": "seema", "requires_evidence": ["silk_tie"] } }
+  ],
+  "contradictions": [
+    { "id": "contra_seema_01", "suspect_id": "seema", "statement_key": "asleep_cabin", "player_must_say": ["tie", "briefcase", "cash", "luggage"], "conflicts_with_evidence": "cash_briefcase", "unlocks_evidence": "cash_briefcase", "trust_delta": -25, "suspicion_delta": 35 }
+  ]
+}

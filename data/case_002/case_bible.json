@@ -1,0 +1,32 @@
+{
+  "case_id": "case_002",
+  "title": "The Final Cut",
+  "difficulty": "medium",
+  "case_summary": "Superstar producer Kabir Malhotra was found poisoned in his vanity van on a Mumbai film set at 23:00. He was known for destroying careers and blackmailing actors. His death happened during a power outage, meaning anyone could have slipped something into his coffee.",
+  "victim": {
+    "name": "Kabir Malhotra",
+    "time_of_death": "23:00",
+    "location": "Vanity Van, Film City, Mumbai",
+    "background": "A powerful producer who used blackmail and drugs to control his actors.",
+    "victim_relationships": [
+      "Zoya (Actress): Kabir was blackmailing her with a scandal.",
+      "Arjun (Director): Kabir was going to replace him with a younger director.",
+      "Rahul (Spot Boy): Kabir humiliated him and refused to pay medical bills.",
+      "Fatima (Manager): Kabir was stealing money from her."
+    ]
+  },
+  "solution": { "murderer_id": "zoya", "required_evidence": ["cyanide_vial", "blackmail_photos"], "logical_rule": "Zoya's alibi fails when the cyanide vial and blackmail photos are found." },
+  "suspects": [
+    { "id": "zoya", "name": "Zoya Khan", "role": "Lead Actress", "motive": "Kabir was blackmailing her.", "secret": "She spiked his coffee.", "initial_trust": 70, "initial_suspicion": 25, "alibi": "Claims she was rehearsing.", "relationships": "You hate Kabir. You think Arjun is spineless." },
+    { "id": "arjun", "name": "Arjun Kapoor", "role": "Director", "motive": "Kabir was going to fire him.", "secret": "He was recording Kabir's deals.", "initial_trust": 80, "initial_suspicion": 15, "alibi": "Claims he was in the editing suite.", "relationships": "You are jealous of Kabir. You think Zoya is difficult." },
+    { "id": "rahul", "name": "Rahul Mehra", "role": "Spot Boy", "motive": "Kabir humiliated him.", "secret": "He stole Kabir's watch.", "initial_trust": 60, "initial_suspicion": 30, "alibi": "Claims he was cleaning.", "relationships": "You are terrified of Kabir. You look up to Arjun." },
+    { "id": "fatima", "name": "Fatima Sheikh", "role": "Manager", "motive": "Kabir was stealing her money.", "secret": "She argued with Kabir.", "initial_trust": 75, "initial_suspicion": 20, "alibi": "Claims she was in catering.", "relationships": "You are loyal to Kabir. You think Zoya is a brat." }
+  ],
+  "evidence": [
+    { "id": "cyanide_vial", "name": "Cyanide Vial", "description": "Found in the trash near the vanity van.", "unlock_condition": { "type": "default", "value": true } },
+    { "id": "blackmail_photos", "name": "Blackmail Photos", "description": "Envelope of photos Kabir used against Zoya.", "unlock_condition": { "type": "suspect_contradiction", "suspect_id": "zoya", "requires_evidence": ["cyanide_vial"] } }
+  ],
+  "contradictions": [
+    { "id": "contra_zoya_01", "suspect_id": "zoya", "statement_key": "rehearsing", "player_must_say": ["coffee", "outage", "cyanide", "photos"], "conflicts_with_evidence": "blackmail_photos", "unlocks_evidence": "blackmail_photos", "trust_delta": -25, "suspicion_delta": 35 }
+  ]
+}

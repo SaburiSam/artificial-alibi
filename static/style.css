@@ -1,0 +1,367 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Special+Elite&display=swap');
+
+:root {
+    --bg-color: #121212;
+    --panel-bg: #1e1e1e;
+    --text-color: #e0e0e0;
+    --accent: #d32f2f;
+    --border: #333;
+    --font-title: 'Oswald', sans-serif;
+    --font-typewriter: 'Special Elite', monospace;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Locks the whole page to the screen */
+}
+
+/* --- HEADER: CRIME SCENE VIBE --- */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+    border-bottom: 3px solid var(--accent);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+    position: relative;
+    flex-shrink: 0; /* Prevents header from shrinking */
+}
+
+/* Crime Scene Tape Effect */
+header::after {
+    content: "";
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: repeating-linear-gradient(
+        -45deg,
+        var(--accent),
+        var(--accent) 10px,
+        #111 10px,
+        #111 20px
+    );
+}
+
+.brand { display: flex; flex-direction: column; gap: 0.2rem; }
+
+.title-container { display: flex; align-items: center; gap: 10px; }
+
+.magnifying-glass {
+    font-size: 1.8rem;
+    filter: drop-shadow(0 0 5px rgba(211, 47, 47, 0.5));
+}
+
+header h1 {
+    font-family: var(--font-title);
+    font-size: 2.2rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 2px 2px 0px #000, 3px 3px 0px var(--accent);
+    margin: 0;
+}
+
+.case-subtitle {
+    font-family: var(--font-typewriter);
+    color: #888;
+    font-size: 1rem;
+    margin-left: 2.8rem;
+}
+
+.header-actions { display: flex; gap: 15px; }
+
+.evidence-btn {
+    position: relative;
+    padding: 10px 20px;
+    background: #222;
+    color: #ddd;
+    font-family: var(--font-typewriter);
+    font-size: 0.9rem;
+    border: 1px solid #444;
+    border-radius: 2px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+}
+
+.evidence-btn:hover {
+    background: #333;
+    color: #fff;
+    border-color: #888;
+    transform: translateY(-2px);
+    box-shadow: 2px 4px 8px rgba(0,0,0,0.6);
+}
+
+.evidence-btn.danger { border-color: var(--accent); color: #ff8a80; }
+.evidence-btn.danger:hover { background: var(--accent); color: #fff; }
+
+.pin {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: var(--accent);
+    border-radius: 50%;
+    margin-right: 8px;
+    box-shadow: inset -2px -2px 4px rgba(0,0,0,0.5), 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+/* --- 3-COLUMN BULLETPROOF LAYOUT --- */
+.game-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap; /* CRITICAL: Forces side-by-side layout */
+    flex: 1;
+    overflow: hidden;
+    width: 100%;
+}
+
+.sidebar {
+    width: 280px;
+    min-width: 280px;
+    flex-shrink: 0; /* CRITICAL: Prevents sidebar from being pushed down */
+    background-color: var(--panel-bg);
+    padding: 1rem;
+    overflow-y: auto; /* Only this column scrolls */
+    border-right: 1px solid var(--border);
+}
+
+.sidebar:last-child {
+    border-right: none;
+    border-left: 1px solid var(--border);
+}
+
+.sidebar h2 {
+    font-family: var(--font-title);
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+    color: #ffb300;
+}
+
+/* --- CHAT AREA --- */
+.chat-area {
+    flex: 1;
+    min-width: 0; /* CRITICAL: Stops long chat messages from breaking flexbox */
+    display: flex;
+    flex-direction: column;
+    background-color: #151515;
+    overflow: hidden;
+}
+
+#chat-header {
+    padding: 1rem;
+    background-color: var(--panel-bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.stat { margin-left: 1rem; font-weight: bold; }
+.trust { color: #4caf50; }
+.suspicion { color: #f44336; }
+
+#chat-box {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.message {
+    padding: 0.8rem;
+    border-radius: 4px;
+    max-width: 80%;
+    line-height: 1.4;
+    font-size: 0.95rem;
+}
+
+.message.system { background: #333; align-self: center; font-style: italic; color: #aaa; }
+.message.player { background: #1e3a8a; align-self: flex-end; }
+.message.suspect { background: #2a2a2a; align-self: flex-start; border-left: 3px solid var(--accent); }
+.message.alert { background: #4a0000; align-self: center; border: 1px solid var(--accent); color: #ff8a80; font-weight: bold; }
+
+.input-area {
+    display: flex;
+    padding: 1rem;
+    background-color: var(--panel-bg);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+#chat-input {
+    flex: 1;
+    padding: 0.8rem;
+    background: #111;
+    border: 1px solid var(--border);
+    color: white;
+    border-radius: 4px 0 0 4px;
+    outline: none;
+}
+
+#chat-input:focus { border-color: var(--accent); }
+
+#send-btn {
+    padding: 0.8rem 1.5rem;
+    background: var(--accent);
+    border: none;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 0 4px 4px 0;
+}
+
+#send-btn:disabled { background: #555; cursor: not-allowed; }
+
+/* --- CARDS (SUSPECTS & EVIDENCE) --- */
+.suspect-card {
+    background: #2a2a2a;
+    padding: 0.8rem;
+    margin-bottom: 0.6rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.suspect-card:hover { background: #3a3a3a; }
+.suspect-card.active { border-left: 4px solid var(--accent); }
+
+.suspect-card strong { font-size: 1rem; display: block; margin-bottom: 2px; }
+.suspect-card small { font-size: 0.8rem; color: #aaa; }
+
+.evidence-card {
+    background: #2a2a2a;
+    padding: 0.8rem;
+    margin-bottom: 0.8rem;
+    border-radius: 4px;
+    border-left: 3px solid #ffb300;
+}
+
+.evidence-card h3 { font-size: 0.95rem; margin-bottom: 0.3rem; color: #ffb300; line-height: 1.2; }
+.evidence-card p { font-size: 0.8rem; color: #bbb; line-height: 1.4; }
+
+/* --- MODALS (CASE FILES & ACCUSATIONS) --- */
+.modal {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: var(--panel-bg);
+    padding: 2rem;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 0 20px rgba(211, 47, 47, 0.2);
+}
+
+.modal-content h2 { color: var(--accent); margin-bottom: 0.5rem; font-family: var(--font-title); }
+.modal-content h3 { font-size: 1.5rem; margin-bottom: 1rem; font-family: var(--font-title); }
+.modal-content hr { border-color: var(--border); margin: 1rem 0; }
+.modal-content p { margin-bottom: 0.5rem; line-height: 1.5; font-size: 0.95rem; }
+.briefing-text { color: #aaa; font-style: italic; margin-top: 1rem; }
+
+.start-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 1rem;
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-family: var(--font-title);
+    letter-spacing: 1px;
+    transition: 0.2s;
+}
+.start-btn:hover { background-color: #f44336; }
+
+/* Keep the modal from getting too tall */
+.modal-content {
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.case-btn {
+    width: 100%;
+    padding: 12px 16px; /* Reduced padding */
+    margin-bottom: 10px;
+    background: #222;
+    color: white;
+    border: 1px solid #444;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+}
+
+.case-btn:hover {
+    background: #2a2a2a;
+    border-color: var(--accent);
+    transform: translateX(5px);
+}
+
+/* Smaller, compact title */
+.case-btn strong {
+    font-family: var(--font-title);
+    font-size: 1.15rem; /* Reduced from 1.4rem */
+    letter-spacing: 1px;
+    color: #fff;
+    display: block;
+    margin-bottom: 2px;
+}
+
+/* Smaller, cleaner difficulty text */
+.case-btn small {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 0.75rem; /* Reduced from 0.85rem */
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    display: block;
+}
+
+.hidden { display: none; }
+
+/* End Game Modal Styling */
+#endgame-content.win {
+    border-color: #4caf50;
+    box-shadow: 0 0 30px rgba(76, 175, 80, 0.4);
+}
+#endgame-content.win h1 { color: #4caf50; text-shadow: 0 0 10px rgba(76, 175, 80, 0.5); }
+
+#endgame-content.lose {
+    border-color: #f44336;
+    box-shadow: 0 0 30px rgba(244, 67, 54, 0.4);
+}
+#endgame-content.lose h1 { color: #f44336; text-shadow: 0 0 10px rgba(244, 67, 54, 0.5); }

@@ -1,0 +1,32 @@
+{
+  "case_id": "case_003",
+  "title": "Concrete Alibi",
+  "difficulty": "medium",
+  "case_summary": "Real estate tycoon Om Prakash was found crushed under a falling concrete block at his construction site in Gurugram at 18:00. It was ruled an accident, but the crane operator's log was faked. Om Prakash was building an illegal complex, and his partners wanted to cut him out of the billions.",
+  "victim": {
+    "name": "Om Prakash",
+    "time_of_death": "18:00",
+    "location": "Construction Site, Gurugram",
+    "background": "A corrupt builder who bribed officials and used substandard materials.",
+    "victim_relationships": [
+      "Rashid (Manager): Om Prakash was going to frame him for the illegal building.",
+      "Sanjay (Partner): Om Prakash was stealing from the company.",
+      "Meera (Architect): Om Prakash ruined her reputation by using cheap materials.",
+      "Karan (Son): Om Prakash refused to pay off Karan's gambling debts."
+    ]
+  },
+  "solution": { "murderer_id": "rashid", "required_evidence": ["fake_crane_log", "bank_transfer"], "logical_rule": "Rashid's alibi fails when the fake crane log and the bank transfer are found." },
+  "suspects": [
+    { "id": "rashid", "name": "Rashid Khan", "role": "Site Manager", "motive": "Om was going to frame him.", "secret": "He rigged the crane.", "initial_trust": 65, "initial_suspicion": 30, "alibi": "Claims he was in the office.", "relationships": "You hate Om. You despise Sanjay." },
+    { "id": "sanjay", "name": "Sanjay Gupta", "role": "Business Partner", "motive": "Om was stealing.", "secret": "He moved money offshore.", "initial_trust": 70, "initial_suspicion": 25, "alibi": "Claims he was at a golf game.", "relationships": "You think Rashid is uneducated. You hate Om." },
+    { "id": "meera", "name": "Meera Deshmukh", "role": "Architect", "motive": "Om ruined her reputation.", "secret": "She threatened to report him.", "initial_trust": 80, "initial_suspicion": 15, "alibi": "Claims she was at her studio.", "relationships": "You hate corruption. You respect Rashid." },
+    { "id": "karan", "name": "Karan Prakash", "role": "Son", "motive": "Needed inheritance for gambling.", "secret": "He stole cash from the safe.", "initial_trust": 75, "initial_suspicion": 20, "alibi": "Claims he was at a club.", "relationships": "You are scared of your father. You think Sanjay is a snake." }
+  ],
+  "evidence": [
+    { "id": "fake_crane_log", "name": "Fake Crane Log", "description": "Shows the crane was operated manually.", "unlock_condition": { "type": "default", "value": true } },
+    { "id": "bank_transfer", "name": "Offshore Transfer", "description": "Proof of Rashid transferring money.", "unlock_condition": { "type": "suspect_contradiction", "suspect_id": "rashid", "requires_evidence": ["fake_crane_log"] } }
+  ],
+  "contradictions": [
+    { "id": "contra_rashid_01", "suspect_id": "rashid", "statement_key": "in_office", "player_must_say": ["crane", "log", "office", "block"], "conflicts_with_evidence": "bank_transfer", "unlocks_evidence": "bank_transfer", "trust_delta": -20, "suspicion_delta": 30 }
+  ]
+}

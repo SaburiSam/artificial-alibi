@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTIFICIAL ALIBI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- CASE SELECTION SCREEN -->
+    <div id="main-menu" class="modal">
+        <div class="modal-content">
+            <h2>The Deception Engine</h2>
+            <h3>Select an Investigation</h3>
+            <div id="case-list" style="margin-top: 1rem;"></div>
+        </div>
+    </div>
+
+    <!-- CASE BRIEFING MODAL -->
+    <div id="case-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 650px; max-height: 90vh; overflow-y: auto;">
+            <h2>CASE FILE</h2>
+            <h3 id="modal-title" style="color: #d32f2f; font-size: 1.8rem;"></h3>
+            <p id="modal-summary" style="font-style: italic; color: #ccc; line-height: 1.6; margin-bottom: 15px;"></p>
+            <hr>
+            <p><strong>VICTIM:</strong> <span id="modal-victim" style="color: #fff;"></span></p>
+            <p><strong>TIME OF DEATH:</strong> <span id="modal-time"></span></p>
+            <p><strong>LOCATION:</strong> <span id="modal-location"></span></p>
+            <p><strong>BACKGROUND:</strong> <span id="modal-background" style="color: #f44336;"></span></p>
+            <hr>
+            <h4 style="margin-bottom: 5px; color: #ffb300;">Known Relationships:</h4>
+            <ul id="modal-relationships" style="margin-left: 20px; font-size: 0.9rem; color: #aaa; line-height: 1.5;"></ul>
+            <hr>
+            <button onclick="startGame()" class="start-btn" id="modal-action-btn">Begin Investigation</button>
+        </div>
+    </div>
+
+    <!-- ACCUSATION MODAL -->
+    <div id="accuse-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>MAKE AN ACCUSATION</h2>
+            <p>Who is the murderer? If you are wrong, the killer will walk free.</p>
+            <div id="accuse-list" style="margin-top: 1rem;"></div>
+            <button onclick="closeAccusation()" class="start-btn" style="background: #555; margin-top: 10px;">Cancel</button>
+        </div>
+    </div>
+
+
+        <!-- END GAME MODAL -->
+    <div id="endgame-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="text-align: center; border-width: 3px;" id="endgame-content">
+            <h1 id="endgame-title" style="font-family: var(--font-title); font-size: 3rem; margin-bottom: 10px;">CASE CLOSED</h1>
+            <p id="endgame-message" style="font-size: 1.2rem; margin-bottom: 20px; color: #ccc;"></p>
+            <button onclick="returnToMenu()" class="start-btn" style="font-size: 1.2rem; padding: 15px;">
+                Return to Main Menu
+            </button>
+        </div>
+    </div>
+
+
+    <!-- DETECTIVE HEADER -->
+    <header>
+        <div class="brand">
+            <div class="title-container">
+                <span class="magnifying-glass">🔍</span>
+                <h1>The Deception Engine</h1>
+            </div>
+            <p id="header-case-title" class="case-subtitle">Select a Case</p>
+        </div>
+
+        <div class="header-actions">
+            <button class="evidence-btn" onclick="openCaseFile()">
+                <span class="pin"></span> View Case File
+            </button>
+            <button class="evidence-btn danger" onclick="openAccusation()">
+                <span class="pin"></span> Make Accusation
+            </button>
+        </div>
+    </header>
+
+    <!-- 3-COLUMN GAME LAYOUT -->
+    <div class="game-container">
+        <!-- LEFT: SUSPECTS -->
+        <aside class="sidebar">
+            <h2>Suspects</h2>
+            <div id="suspect-list"></div>
+        </aside>
+
+        <!-- MIDDLE: CHAT -->
+        <main class="chat-area">
+            <div id="chat-header">
+                <h2 id="current-suspect-name">Select a Suspect</h2>
+                <div id="stats-container" class="hidden">
+                    <span class="stat trust">Trust: <span id="trust-val">0</span></span>
+                    <span class="stat suspicion">Suspicion: <span id="suspicion-val">0</span></span>
+                </div>
+            </div>
+
+            <div id="chat-box">
+                <div class="message system">Select a suspect from the left to begin interrogating.</div>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="chat-input" placeholder="Ask a question..." disabled>
+                <button id="send-btn" disabled>Send</button>
+            </div>
+        </main>
+
+        <!-- RIGHT: EVIDENCE -->
+        <aside class="sidebar">
+            <h2>Evidence Board</h2>
+            <div id="evidence-list"></div>
+        </aside>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

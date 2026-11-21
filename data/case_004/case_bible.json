@@ -1,0 +1,32 @@
+{
+  "case_id": "case_004",
+  "title": "Crimson Academia",
+  "difficulty": "hard",
+  "case_summary": "Professor Ramesh Iyer was found stabbed in the Delhi University library at 20:00. The library was locked from the inside. He was a ruthless academic who stole his students' research and had affairs with colleagues' wives.",
+  "victim": {
+    "name": "Professor Ramesh Iyer",
+    "time_of_death": "20:00",
+    "location": "Rare Books Section, Delhi University",
+    "background": "A genius scholar with a god complex who ruined the careers of anyone who challenged him.",
+    "victim_relationships": [
+      "Kabir (Student): Iyer stole Kabir's groundbreaking thesis.",
+      "Anjali (Librarian): Iyer was blackmailing her over a past affair.",
+      "Dinesh (Colleague): Iyer had an affair with Dinesh's wife.",
+      "Lakshmi (Wife): Iyer was abusive and she wanted his life insurance."
+    ]
+  },
+  "solution": { "murderer_id": "kabir", "required_evidence": ["bloody_dagger", "thesis_papers"], "logical_rule": "Kabir's alibi fails when the bloody dagger and the thesis papers are found." },
+  "suspects": [
+    { "id": "kabir", "name": "Kabir Bose", "role": "Research Student", "motive": "Iyer stole his thesis.", "secret": "He stabbed Iyer.", "initial_trust": 75, "initial_suspicion": 20, "alibi": "Claims he was in the dorm.", "relationships": "You hate Iyer. You are jealous of Anjali." },
+    { "id": "anjali", "name": "Anjali Menon", "role": "Librarian", "motive": "Iyer was blackmailing her.", "secret": "She hid the dagger.", "initial_trust": 60, "initial_suspicion": 30, "alibi": "Claims she was in the basement.", "relationships": "You are terrified of Iyer. You think Kabir is a genius." },
+    { "id": "dinesh", "name": "Dr. Dinesh Varma", "role": "Colleague", "motive": "Iyer ruined his marriage.", "secret": "He saw Kabir leaving.", "initial_trust": 80, "initial_suspicion": 15, "alibi": "Claims he was in his lab.", "relationships": "You want Iyer dead. You don't trust Kabir." },
+    { "id": "lakshmi", "name": "Lakshmi Iyer", "role": "Wife", "motive": "Insurance money.", "secret": "She was recording his abuse.", "initial_trust": 85, "initial_suspicion": 10, "alibi": "Claims she was at home.", "relationships": "You despise your husband. You pity Dinesh." }
+  ],
+  "evidence": [
+    { "id": "bloody_dagger", "name": "Bloody Dagger", "description": "Ceremonial dagger from the history department.", "unlock_condition": { "type": "default", "value": true } },
+    { "id": "thesis_papers", "name": "Stolen Thesis", "description": "Thesis papers with Kabir's name crossed out.", "unlock_condition": { "type": "suspect_contradiction", "suspect_id": "kabir", "requires_evidence": ["bloody_dagger"] } }
+  ],
+  "contradictions": [
+    { "id": "contra_kabir_01", "suspect_id": "kabir", "statement_key": "in_dorm", "player_must_say": ["library", "dagger", "thesis", "research"], "conflicts_with_evidence": "thesis_papers", "unlocks_evidence": "thesis_papers", "trust_delta": -15, "suspicion_delta": 25 }
+  ]
+}
