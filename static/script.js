@@ -7,27 +7,20 @@ async function loadCases() {
     const response = await fetch('/api/cases');
     let cases = await response.json();
     
-    // 1. Define the difficulty order
-    const difficultyWeight = {
-        'EASY': 1,
-        'MEDIUM': 2,
-        'HARD': 3
-    };
+    // Define the difficulty order
+    const difficultyWeight = { 'EASY': 1, 'MEDIUM': 2, 'HARD': 3 };
 
-    // 2. Sort the cases by difficulty first, then alphabetically by title
+    // Sort cases by difficulty, then alphabetically by title
     cases.sort((a, b) => {
         const weightA = difficultyWeight[a.difficulty.toUpperCase()] || 99;
         const weightB = difficultyWeight[b.difficulty.toUpperCase()] || 99;
-        
-        if (weightA !== weightB) {
-            return weightA - weightB; // Sort by difficulty
-        }
-        return a.title.localeCompare(b.title); // If same difficulty, sort A-Z
+        if (weightA !== weightB) return weightA - weightB;
+        return a.title.localeCompare(b.title);
     });
 
     const list = document.getElementById('case-list');
     list.innerHTML = '';
-    
+
     cases.forEach(c => {
         const btn = document.createElement('button');
         btn.className = 'case-btn';
@@ -35,6 +28,12 @@ async function loadCases() {
         btn.onclick = () => selectCase(c.id);
         list.appendChild(btn);
     });
+}
+
+// --- HOME SCREEN ---
+function enterMainMenu() {
+    document.getElementById('home-modal').style.display = 'none';
+    document.getElementById('main-menu').style.display = 'flex';
 }
 
 async function selectCase(caseId) {
@@ -45,13 +44,13 @@ async function selectCase(caseId) {
 
     document.getElementById('main-menu').style.display = 'none';
 
-    const response = await fetch('/api/case_info');
+    const response = await fetch('/api/case_info', { cache: 'no-store' });
     currentCaseData = await response.json();
 
     showCaseModal(true);
     loadSuspects();
     loadEvidence();
-    loadChatHistory(); // Load history when starting a case
+    loadChatHistory(); 
 }
 
 function showCaseModal(isStarting) {
@@ -88,7 +87,7 @@ function closeCaseFile() { document.getElementById('case-modal').style.display =
 
 // --- GAMEPLAY ---
 async function loadSuspects() {
-    const response = await fetch('/api/suspects');
+    const response = await fetch('/api/suspects', { cache: 'no-store' });
     const suspects = await response.json();
 
     const list = document.getElementById('suspect-list');
@@ -114,7 +113,6 @@ function selectSuspect(suspect) {
     document.getElementById('chat-input').disabled = false;
     document.getElementById('send-btn').disabled = false;
 
-    // DON'T clear the chat box! Just add a system divider.
     const chatBox = document.getElementById('chat-box');
     chatBox.innerHTML += `<div class="message system">--- You approached ${suspect.name} ---</div>`;
     chatBox.scrollTop = chatBox.scrollHeight;
@@ -143,7 +141,6 @@ async function sendMessage() {
             return;
         }
 
-        // Show who is talking in the chat bubble
         chatBox.innerHTML += `<div class="message suspect"><strong>${currentSuspectName}:</strong><br>${data.dialogue}</div>`;
 
         document.getElementById('trust-val').innerText = data.updated_state.trust;
@@ -162,7 +159,8 @@ async function sendMessage() {
 
 // --- EVIDENCE BOARD ---
 async function loadEvidence() {
-    const response = await fetch('/api/state');
+    // ADDED CACHE NO-STORE HERE
+    const response = await fetch('/api/state', { cache: 'no-store' });
     const state = await response.json();
 
     const evidenceList = document.getElementById('evidence-list');
@@ -178,9 +176,10 @@ async function loadEvidence() {
     });
 }
 
-// --- CHAT HISTORY (New Function) ---
+// --- CHAT HISTORY ---
 async function loadChatHistory() {
-    const response = await fetch('/api/state');
+    // ADDED CACHE NO-STORE HERE
+    const response = await fetch('/api/state', { cache: 'no-store' });
     const state = await response.json();
 
     const chatBox = document.getElementById('chat-box');
@@ -193,7 +192,6 @@ async function loadChatHistory() {
             } else if (msg.role === 'alert') {
                 chatBox.innerHTML += `<div class="message alert">${msg.text}</div>`;
             } else {
-                // Find the suspect's name for the bubble
                 chatBox.innerHTML += `<div class="message suspect"><strong>Suspect:</strong><br>${msg.text}</div>`;
             }
         });
@@ -203,7 +201,8 @@ async function loadChatHistory() {
 
 // --- ACCUSATION SYSTEM ---
 async function openAccusation() {
-    const response = await fetch('/api/state');
+    // ADDED CACHE NO-STORE HERE
+    const response = await fetch('/api/state', { cache: 'no-store' });
     const state = await response.json();
 
     const list = document.getElementById('accuse-list');
@@ -230,13 +229,11 @@ async function submitAccusation(suspectId) {
     });
     const data = await response.json();
 
-    // 1. Get the End Game elements
     const endModal = document.getElementById('endgame-modal');
     const endContent = document.getElementById('endgame-content');
     const endTitle = document.getElementById('endgame-title');
     const endMessage = document.getElementById('endgame-message');
 
-    // 2. Clear old styles and apply new ones based on Win/Loss
     endContent.className = 'modal-content';
 
     if (data.success) {
@@ -249,13 +246,10 @@ async function submitAccusation(suspectId) {
         endMessage.innerText = data.message;
     }
 
-    // 3. Show the screen
     endModal.style.display = 'flex';
 }
 
-// 4. Function to reset everything and go back to the start
 function returnToMenu() {
-    // Reloading the page is the cleanest way to clear all state, chats, and memory for a fresh game
     window.location.reload();
 }
 
@@ -266,10 +260,3 @@ document.getElementById('chat-input').addEventListener('keypress', (e) => {
 });
 
 loadCases();
-
-function enterMainMenu() {
-    // Hide the home screen
-    document.getElementById('home-modal').style.display = 'none';
-    // Show the case selection screen
-    document.getElementById('main-menu').style.display = 'flex';
-}
