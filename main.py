@@ -134,27 +134,40 @@ def interrogate():
     if suspect_id not in GAME_STATE["suspect_chats"]:
         GAME_STATE["suspect_chats"][suspect_id] = []
 
-    # Find the EXACT statement_key this suspect is supposed to say if they lie
-    expected_statement = "none"
-    for c in CASE_BIBLE.get("contradictions", []):
-        if c["suspect_id"] == suspect_id:
-            expected_statement = c["statement_key"]
+    # Find what evidence the player currently has
+    current_evidence = GAME_STATE["unlocked_evidence"]
+    
+    # Check if this suspect is the actual murderer
+    is_murderer = (suspect_id == CASE_BIBLE["solution"]["murderer_id"])
+    
+    # Check if the player has gathered ALL the required circumstantial evidence
+    required_ev = CASE_BIBLE["solution"]["required_evidence"]
+    has_all_evidence = all(ev in current_evidence for ev in required_ev if ev != "confession")
 
     system_prompt = f"""
     You are {suspect['name']}, the {suspect['role']}.
     You are being interrogated by a detective about the murder of {CASE_BIBLE['victim']['name']}.
 
-    CASE CONTEXT: {CASE_BIBLE['case_summary']}
     YOUR PROFILE: Motive: {suspect['motive']} | Alibi: {suspect['alibi']}
     YOUR RELATIONSHIPS: {suspect.get('relationships', 'You only care about yourself.')}
+    
+    THE DETECTIVE CURRENTLY HAS THIS EVIDENCE: {current_evidence}
 
     RULES:
-    1. NEVER confess to the murder directly.
-    2. You are defensive, BUT if the detective presses you politely, you are willing to gossip about others.
+    1. NEVER confess to the murder directly, UNLESS the conditions below are met.
+    2. Stay in character. Be defensive, nervous, and deflect blame.
     3. Keep dialogue short (1-3 sentences).
     4. NEVER say the 'statement_key' out loud. Speak naturally.
-    5. If the detective mentions anything about your alibi or asks where you were, you MUST set the statement_key to exactly '{expected_statement}'.
+    5. If the detective mentions your alibi, set statement_key to match your alibi.
     """
+
+    # If the AI is the murderer, and the player has all the evidence, we tell the AI to confess!
+    if is_murderer and has_all_evidence:
+        system_prompt += """
+        CRITICAL INSTRUCTION: The detective has presented all the undeniable evidence against you. Your back is against the wall. 
+        You MUST break down and confess to the murder in this response. 
+        Set 'confession_given' to true, and make your dialogue a dramatic confession.
+        """
 
     try:
         client = genai.Client(api_key=API_KEY, http_options={'api_version': 'v1beta'})
@@ -183,27 +196,32 @@ def interrogate():
 
         current_status = GAME_STATE["suspect_status"][suspect_id]
         current_status["trust"] = max(0, min(100, current_status["trust"] + ai_result["trust_delta"]))
-        current_status["suspicion"] = max(0, min(100, current_status["suspicion"] + ai_result["suspicion_delta"]))
+        current_status["suspicion"] = min(100, current_status["suspicion"] + ai_result["suspicion_delta"])
 
         game_event = None
+
+        # Check if the AI confessed
+        if ai_result.get("confession_given") and "confession" not in GAME_STATE["unlocked_evidence"]:
+            GAME_STATE["unlocked_evidence"].append("confession")
+            game_event = "CONFESSION! The suspect broke down and confessed. 'Signed Confession' added to Evidence Board."
+            GAME_STATE["chat_log"].append({"suspect_id": "system", "role": "alert", "text": game_event})
+
+        # Standard contradiction logic (kept for unlocking the other evidence)
         ai_statement = ai_result["statement_key"]
         player_msg_lower = player_message.lower()
-
-        for contradiction in CASE_BIBLE.get("contradictions", []):
-            if contradiction["suspect_id"] == suspect_id:
-                keywords = contradiction.get("player_must_say", [])
-                # Made the keyword matching more forgiving
-                player_presented_evidence = any(k in player_msg_lower for k in keywords)
-
-                if player_presented_evidence and (contradiction["statement_key"] in ai_statement or ai_statement in contradiction["statement_key"] or ai_statement == expected_statement):
-                    unlock_id = contradiction.get("unlocks_evidence")
-                    if unlock_id and unlock_id not in GAME_STATE["unlocked_evidence"]:
-                        GAME_STATE["unlocked_evidence"].append(unlock_id)
-                        current_status["trust"] = max(0, current_status["trust"] + contradiction["trust_delta"])
-                        current_status["suspicion"] = min(100, current_status["suspicion"] + contradiction["suspicion_delta"])
-                        game_event = f"CONTRADICTION! Suspect caught in a lie. New evidence unlocked: {unlock_id}"
-                        GAME_STATE["chat_log"].append({"suspect_id": "system", "role": "alert", "text": game_event})
-                        break
+        
+        if not game_event: # Only check contradictions if no confession happened
+            for contradiction in CASE_BIBLE.get("contradictions", []):
+                if contradiction["suspect_id"] == suspect_id:
+                    keywords = contradiction.get("player_must_say", [])
+                    player_presented_evidence = any(k in player_msg_lower for k in keywords)
+                    if player_presented_evidence and (contradiction["statement_key"] in ai_statement or ai_statement in contradiction["statement_key"]):
+                        unlock_id = contradiction.get("unlocks_evidence")
+                        if unlock_id and unlock_id not in GAME_STATE["unlocked_evidence"]:
+                            GAME_STATE["unlocked_evidence"].append(unlock_id)
+                            game_event = f"CONTRADICTION! Suspect caught in a lie. New evidence unlocked: {unlock_id}"
+                            GAME_STATE["chat_log"].append({"suspect_id": "system", "role": "alert", "text": game_event})
+                            break
 
         return jsonify({
             "dialogue": ai_result["dialogue"],
@@ -227,15 +245,9 @@ def accuse():
     has_evidence = all(ev in GAME_STATE["unlocked_evidence"] for ev in required_evidence)
 
     if accused_id == actual_murderer_id and has_evidence:
-        GAME_STATE["game_over"] = True
-        GAME_STATE["player_won"] = True
-        return jsonify({"success": True, "message": f"You solved the case! {actual_murderer_name} did it."})
+        return jsonify({"success": True, "message": f"Justice is served. {actual_murderer_name} confessed to the murder after being presented with the undeniable evidence."})
     elif accused_id == actual_murderer_id and not has_evidence:
-        return jsonify({"success": False, "message": "You accused the right person, but you don't have enough evidence to convict them!"})
-    else:
-        GAME_STATE["game_over"] = True
-        GAME_STATE["player_won"] = False
-        return jsonify({"success": False, "message": f"Wrong accusation! {actual_murderer_name} got away with it."})
+        return jsonify({"success": False, "message": "You accused the right person, but without a confession or solid proof, their lawyer got them off. They walked free."})
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
