@@ -1,16 +1,14 @@
 let currentSuspectId = null;
 let currentSuspectName = "";
 let currentCaseData = null;
+let allSuspects = []; // Store suspects to update their stats
 
 // --- MAIN MENU ---
 async function loadCases() {
     const response = await fetch('/api/cases');
     let cases = await response.json();
     
-    // Define the difficulty order
     const difficultyWeight = { 'EASY': 1, 'MEDIUM': 2, 'HARD': 3 };
-
-    // Sort cases by difficulty, then alphabetically by title
     cases.sort((a, b) => {
         const weightA = difficultyWeight[a.difficulty.toUpperCase()] || 99;
         const weightB = difficultyWeight[b.difficulty.toUpperCase()] || 99;
@@ -88,14 +86,15 @@ function closeCaseFile() { document.getElementById('case-modal').style.display =
 // --- GAMEPLAY ---
 async function loadSuspects() {
     const response = await fetch('/api/suspects', { cache: 'no-store' });
-    const suspects = await response.json();
+    allSuspects = await response.json();
 
     const list = document.getElementById('suspect-list');
     list.innerHTML = '';
 
-    suspects.forEach(suspect => {
+    allSuspects.forEach(suspect => {
         const card = document.createElement('div');
         card.className = 'suspect-card';
+        card.id = `suspect-card-${suspect.id}`;
         card.innerHTML = `<strong>${suspect.name}</strong><br><small>${suspect.role}</small>`;
         card.onclick = () => selectSuspect(suspect);
         list.appendChild(card);
@@ -106,10 +105,13 @@ function selectSuspect(suspect) {
     currentSuspectId = suspect.id;
     currentSuspectName = suspect.name;
 
+    // Find latest stats from memory (in case we interrogated them earlier)
+    const latestData = allSuspects.find(s => s.id === suspect.id);
+
     document.getElementById('current-suspect-name').innerText = suspect.name;
     document.getElementById('stats-container').classList.remove('hidden');
-    document.getElementById('trust-val').innerText = suspect.trust;
-    document.getElementById('suspicion-val').innerText = suspect.suspicion;
+    document.getElementById('trust-val').innerText = latestData.trust;
+    document.getElementById('suspicion-val').innerText = latestData.suspicion;
     document.getElementById('chat-input').disabled = false;
     document.getElementById('send-btn').disabled = false;
 
@@ -143,8 +145,16 @@ async function sendMessage() {
 
         chatBox.innerHTML += `<div class="message suspect"><strong>${currentSuspectName}:</strong><br>${data.dialogue}</div>`;
 
+        // Update top bar
         document.getElementById('trust-val').innerText = data.updated_state.trust;
         document.getElementById('suspicion-val').innerText = data.updated_state.suspicion;
+        
+        // UPDATE THE SIDEBAR CARD SO IT DOESN'T RESET
+        const suspectObj = allSuspects.find(s => s.id === currentSuspectId);
+        if (suspectObj) {
+            suspectObj.trust = data.updated_state.trust;
+            suspectObj.suspicion = data.updated_state.suspicion;
+        }
 
         if (data.game_event) {
             chatBox.innerHTML += `<div class="message alert">${data.game_event}</div>`;
@@ -159,7 +169,6 @@ async function sendMessage() {
 
 // --- EVIDENCE BOARD ---
 async function loadEvidence() {
-    // ADDED CACHE NO-STORE HERE
     const response = await fetch('/api/state', { cache: 'no-store' });
     const state = await response.json();
 
@@ -178,7 +187,6 @@ async function loadEvidence() {
 
 // --- CHAT HISTORY ---
 async function loadChatHistory() {
-    // ADDED CACHE NO-STORE HERE
     const response = await fetch('/api/state', { cache: 'no-store' });
     const state = await response.json();
 
@@ -201,8 +209,8 @@ async function loadChatHistory() {
 
 // --- ACCUSATION SYSTEM ---
 async function openAccusation() {
-    // ADDED CACHE NO-STORE HERE
-    const response = await fetch('/api/state', { cache: 'no-store' });
+    // Added Date.now() to completely bypass browser caching
+    const response = await fetch('/api/state?t=' + Date.now(), { cache: 'no-store' });
     const state = await response.json();
 
     const list = document.getElementById('accuse-list');
