@@ -15,7 +15,7 @@
       "Ananya (Assistant): Aarav ruined her career after she rejected him."
     ]
   },
-  "solution": { "murderer_id": "priya", "required_evidence": ["modified_server", "lawsuit_draft"], "logical_rule": "Priya's alibi fails when the modified server and the lawsuit draft are found." },
+    "solution": { "murderer_id": "priya", "required_evidence": ["modified_server", "lawsuit_draft", "resignation_letter", "confession"], "logical_rule": "You need the confession to convict." },
   "suspects": [
     { "id": "priya", "name": "Priya Patel", "role": "CTO & Co-founder", "motive": "Aarav stole her code.", "secret": "She modified the server.", "initial_trust": 75, "initial_suspicion": 20, "alibi": "Claims she was in the conference room.", "relationships": "You hate Vikram because he's a loyal dog. You pity Rohan." },
     { "id": "vikram", "name": "Vikram Singh", "role": "Investor", "motive": "Aarav was about to expose his embezzlement.", "secret": "He was shredding documents.", "initial_trust": 60, "initial_suspicion": 30, "alibi": "Claims he left at 20:00.", "relationships": "You despise Priya. You think Rohan is useless." },
@@ -24,7 +24,8 @@
   ],
   "evidence": [
     { "id": "modified_server", "name": "Modified Server", "description": "Tampered to cause an electrical surge.", "unlock_condition": { "type": "default", "value": true } },
-    { "id": "lawsuit_draft", "name": "Lawsuit Draft", "description": "A hidden draft of a harassment lawsuit.", "unlock_condition": { "type": "suspect_contradiction", "suspect_id": "priya", "requires_evidence": ["modified_server"] } }
+    { "id": "lawsuit_draft", "name": "Lawsuit Draft", "description": "A hidden draft of a harassment lawsuit.", "unlock_condition": { "type": "suspect_contradiction", "suspect_id": "priya", "requires_evidence": ["modified_server"] } },
+    { "id": "confession", "name": "Signed Confession", "description": "A full breakdown and confession from the killer.", "unlock_condition": { "type": "default", "value": false } }
   ],
   "contradictions": [
     { "id": "contra_priya_01", "suspect_id": "priya", "statement_key": "on_call", "player_must_say": ["server", "conference room", "code"], "conflicts_with_evidence": "lawsuit_draft", "unlocks_evidence": "lawsuit_draft", "trust_delta": -20, "suspicion_delta": 30 }
