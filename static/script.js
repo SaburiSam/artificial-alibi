@@ -5,11 +5,29 @@ let currentCaseData = null;
 // --- MAIN MENU ---
 async function loadCases() {
     const response = await fetch('/api/cases');
-    const cases = await response.json();
+    let cases = await response.json();
+    
+    // 1. Define the difficulty order
+    const difficultyWeight = {
+        'EASY': 1,
+        'MEDIUM': 2,
+        'HARD': 3
+    };
+
+    // 2. Sort the cases by difficulty first, then alphabetically by title
+    cases.sort((a, b) => {
+        const weightA = difficultyWeight[a.difficulty.toUpperCase()] || 99;
+        const weightB = difficultyWeight[b.difficulty.toUpperCase()] || 99;
+        
+        if (weightA !== weightB) {
+            return weightA - weightB; // Sort by difficulty
+        }
+        return a.title.localeCompare(b.title); // If same difficulty, sort A-Z
+    });
 
     const list = document.getElementById('case-list');
     list.innerHTML = '';
-
+    
     cases.forEach(c => {
         const btn = document.createElement('button');
         btn.className = 'case-btn';
