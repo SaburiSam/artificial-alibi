@@ -15,7 +15,7 @@
       "Fatima (Manager): Kabir was stealing money from her."
     ]
   },
-  "solution": { "murderer_id": "zoya", "required_evidence": ["cyanide_vial", "blackmail_photos"], "logical_rule": "Zoya's alibi fails when the cyanide vial and blackmail photos are found." },
+  "solution": { "murderer_id": "zoya", "required_evidence": ["cyanide_vial", "blackmail_photos", "power_outage_log", "confession"], "logical_rule": "Zoya's alibi fails when the cyanide, photos, and outage log are found." },
   "suspects": [
     { "id": "zoya", "name": "Zoya Khan", "role": "Lead Actress", "motive": "Kabir was blackmailing her.", "secret": "She spiked his coffee.", "initial_trust": 70, "initial_suspicion": 25, "alibi": "Claims she was rehearsing.", "relationships": "You hate Kabir. You think Arjun is spineless." },
     { "id": "arjun", "name": "Arjun Kapoor", "role": "Director", "motive": "Kabir was going to fire him.", "secret": "He was recording Kabir's deals.", "initial_trust": 80, "initial_suspicion": 15, "alibi": "Claims he was in the editing suite.", "relationships": "You are jealous of Kabir. You think Zoya is difficult." },
@@ -24,9 +24,12 @@
   ],
   "evidence": [
     { "id": "cyanide_vial", "name": "Cyanide Vial", "description": "Found in the trash near the vanity van.", "unlock_condition": { "type": "default", "value": true } },
-    { "id": "blackmail_photos", "name": "Blackmail Photos", "description": "Envelope of photos Kabir used against Zoya.", "unlock_condition": { "type": "suspect_contradiction", "suspect_id": "zoya", "requires_evidence": ["cyanide_vial"] } }
+    { "id": "blackmail_photos", "name": "Blackmail Photos", "description": "Envelope of photos Kabir used against Zoya.", "unlock_condition": { "type": "suspect_contradiction", "suspect_id": "zoya", "requires_evidence": ["cyanide_vial"] } },
+    { "id": "power_outage_log", "name": "Power Outage Log", "description": "Shows the outage was localized to Kabir's van.", "unlock_condition": { "type": "suspect_contradiction", "suspect_id": "arjun", "requires_evidence": [] } },
+    { "id": "confession", "name": "Signed Confession", "description": "A full breakdown and confession from the killer.", "unlock_condition": { "type": "default", "value": false } }
   ],
   "contradictions": [
-    { "id": "contra_zoya_01", "suspect_id": "zoya", "statement_key": "rehearsing", "player_must_say": ["coffee", "outage", "cyanide", "photos"], "conflicts_with_evidence": "blackmail_photos", "unlocks_evidence": "blackmail_photos", "trust_delta": -25, "suspicion_delta": 35 }
+    { "id": "contra_zoya_01", "suspect_id": "zoya", "statement_key": "rehearsing", "player_must_say": ["coffee", "outage", "cyanide", "photos"], "conflicts_with_evidence": "blackmail_photos", "unlocks_evidence": "blackmail_photos", "trust_delta": -25, "suspicion_delta": 35 },
+    { "id": "contra_arjun_01", "suspect_id": "arjun", "statement_key": "editing_suite", "player_must_say": ["outage", "power", "lights", "log"], "conflicts_with_evidence": "power_outage_log", "unlocks_evidence": "power_outage_log", "trust_delta": -15, "suspicion_delta": 20 }
   ]
 }
