@@ -15,7 +15,7 @@
       "Lakshmi (Wife): Iyer was abusive and she wanted his life insurance."
     ]
   },
-  "solution": { "murderer_id": "kabir", "required_evidence": ["bloody_dagger", "thesis_papers"], "logical_rule": "Kabir's alibi fails when the bloody dagger and the thesis papers are found." },
+  "solution": { "murderer_id": "kabir", "required_evidence": ["bloody_dagger", "thesis_papers", "library_keycard", "confession"], "logical_rule": "Kabir's alibi fails when the dagger, papers, and keycard are found." },
   "suspects": [
     { "id": "kabir", "name": "Kabir Bose", "role": "Research Student", "motive": "Iyer stole his thesis.", "secret": "He stabbed Iyer.", "initial_trust": 75, "initial_suspicion": 20, "alibi": "Claims he was in the dorm.", "relationships": "You hate Iyer. You are jealous of Anjali." },
     { "id": "anjali", "name": "Anjali Menon", "role": "Librarian", "motive": "Iyer was blackmailing her.", "secret": "She hid the dagger.", "initial_trust": 60, "initial_suspicion": 30, "alibi": "Claims she was in the basement.", "relationships": "You are terrified of Iyer. You think Kabir is a genius." },
@@ -24,9 +24,12 @@
   ],
   "evidence": [
     { "id": "bloody_dagger", "name": "Bloody Dagger", "description": "Ceremonial dagger from the history department.", "unlock_condition": { "type": "default", "value": true } },
-    { "id": "thesis_papers", "name": "Stolen Thesis", "description": "Thesis papers with Kabir's name crossed out.", "unlock_condition": { "type": "suspect_contradiction", "suspect_id": "kabir", "requires_evidence": ["bloody_dagger"] } }
+    { "id": "thesis_papers", "name": "Stolen Thesis", "description": "Thesis papers with Kabir's name crossed out.", "unlock_condition": { "type": "suspect_contradiction", "suspect_id": "kabir", "requires_evidence": ["bloody_dagger"] } },
+    { "id": "library_keycard", "name": "Library Keycard", "description": "A keycard log showing someone entered the rare books section.", "unlock_condition": { "type": "suspect_contradiction", "suspect_id": "anjali", "requires_evidence": [] } },
+    { "id": "confession", "name": "Signed Confession", "description": "A full breakdown and confession from the killer.", "unlock_condition": { "type": "default", "value": false } }
   ],
   "contradictions": [
-    { "id": "contra_kabir_01", "suspect_id": "kabir", "statement_key": "in_dorm", "player_must_say": ["library", "dagger", "thesis", "research"], "conflicts_with_evidence": "thesis_papers", "unlocks_evidence": "thesis_papers", "trust_delta": -15, "suspicion_delta": 25 }
+    { "id": "contra_kabir_01", "suspect_id": "kabir", "statement_key": "in_dorm", "player_must_say": ["library", "dagger", "thesis", "research"], "conflicts_with_evidence": "thesis_papers", "unlocks_evidence": "thesis_papers", "trust_delta": -15, "suspicion_delta": 25 },
+    { "id": "contra_anjali_01", "suspect_id": "anjali", "statement_key": "in_basement", "player_must_say": ["keycard", "log", "basement", "entered"], "conflicts_with_evidence": "library_keycard", "unlocks_evidence": "library_keycard", "trust_delta": -20, "suspicion_delta": 30 }
   ]
 }
