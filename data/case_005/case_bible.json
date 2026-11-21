@@ -15,7 +15,7 @@
       "Tania (Journalist): Rajiv was suing her for defamation."
     ]
   },
-  "solution": { "murderer_id": "seema", "required_evidence": ["silk_tie", "cash_briefcase"], "logical_rule": "Seema's alibi fails when the silk tie and the missing briefcase are found." },
+  "solution": { "murderer_id": "seema", "required_evidence": ["silk_tie", "cash_briefcase", "train_cabin_key", "confession"], "logical_rule": "Seema's alibi fails when the tie, briefcase, and cabin key are found." },
   "suspects": [
     { "id": "seema", "name": "Seema Malhotra", "role": "Ex-Wife", "motive": "Rajiv cheated her.", "secret": "She strangled him.", "initial_trust": 70, "initial_suspicion": 25, "alibi": "Claims she was asleep.", "relationships": "You hate Rajiv. You think Rathore is incompetent." },
     { "id": "rathore", "name": "Inspector Rathore", "role": "Police Officer", "motive": "Rajiv ruined his career.", "secret": "He was stalking Rajiv.", "initial_trust": 80, "initial_suspicion": 15, "alibi": "Claims he was patrolling.", "relationships": "You hate corruption. You suspect everyone." },
@@ -24,9 +24,12 @@
   ],
   "evidence": [
     { "id": "silk_tie", "name": "Silk Tie", "description": "Rajiv's tie, used as the murder weapon.", "unlock_condition": { "type": "default", "value": true } },
-    { "id": "cash_briefcase", "name": "Missing Briefcase", "description": "Found hidden inside Seema's luggage.", "unlock_condition": { "type": "suspect_contradiction", "suspect_id": "seema", "requires_evidence": ["silk_tie"] } }
+    { "id": "cash_briefcase", "name": "Missing Briefcase", "description": "Found hidden inside Seema's luggage.", "unlock_condition": { "type": "suspect_contradiction", "suspect_id": "seema", "requires_evidence": ["silk_tie"] } },
+    { "id": "train_cabin_key", "name": "Duplicate Cabin Key", "description": "A key that can unlock Rajiv's cabin from the outside.", "unlock_condition": { "type": "suspect_contradiction", "suspect_id": "vikram", "requires_evidence": [] } },
+    { "id": "confession", "name": "Signed Confession", "description": "A full breakdown and confession from the killer.", "unlock_condition": { "type": "default", "value": false } }
   ],
   "contradictions": [
-    { "id": "contra_seema_01", "suspect_id": "seema", "statement_key": "asleep_cabin", "player_must_say": ["tie", "briefcase", "cash", "luggage"], "conflicts_with_evidence": "cash_briefcase", "unlocks_evidence": "cash_briefcase", "trust_delta": -25, "suspicion_delta": 35 }
+    { "id": "contra_seema_01", "suspect_id": "seema", "statement_key": "asleep_cabin", "player_must_say": ["tie", "briefcase", "cash", "luggage"], "conflicts_with_evidence": "cash_briefcase", "unlocks_evidence": "cash_briefcase", "trust_delta": -25, "suspicion_delta": 35 },
+    { "id": "contra_vikram_01", "suspect_id": "vikram", "statement_key": "dining_car", "player_must_say": ["key", "cabin", "dining car", "unlock"], "conflicts_with_evidence": "train_cabin_key", "unlocks_evidence": "train_cabin_key", "trust_delta": -15, "suspicion_delta": 25 }
   ]
 }
