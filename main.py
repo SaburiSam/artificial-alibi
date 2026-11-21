@@ -25,16 +25,13 @@ for case_folder in CASES_DIR.iterdir():
                 case_data = json.load(f)
                 ALL_CASES[case_data["case_id"]] = case_data
 
-# Default active case
 ACTIVE_CASE_ID = "case_001"
 CASE_BIBLE = ALL_CASES[ACTIVE_CASE_ID]
 
-
-# Function to reset game state when a new case is chosen
 def reset_game_state(case_id):
     global ACTIVE_CASE_ID, CASE_BIBLE, GAME_STATE
     ACTIVE_CASE_ID = case_id
-    CASE_BIBLE = ALL_CASES[case_id] # Updates the active case
+    CASE_BIBLE = ALL_CASES[case_id]
     
     GAME_STATE = {
         "case_id": CASE_BIBLE["case_id"],
@@ -47,14 +44,11 @@ def reset_game_state(case_id):
         "suspect_chats": {}
     }
     
-    # Auto-unlock evidence with "default" conditions
     for ev in CASE_BIBLE["evidence"]:
         if ev["unlock_condition"]["type"] == "default" and ev["unlock_condition"]["value"]:
             GAME_STATE["unlocked_evidence"].append(ev["id"])
 
-# Initialize the default game state
 reset_game_state(ACTIVE_CASE_ID)
-
 
 def get_suspect(suspect_id):
     for s in CASE_BIBLE["suspects"]:
@@ -62,16 +56,13 @@ def get_suspect(suspect_id):
             return s
     return None
 
-
 @app.route("/api/cases")
 def list_cases():
-    """Returns a list of all available cases for the main menu."""
     case_list = [{"id": c["case_id"], "title": c["title"], "difficulty": c["difficulty"]} for c in ALL_CASES.values()]
     return jsonify(case_list)
 
 @app.route("/api/start_case", methods=["POST"])
 def start_case():
-    """Switches the active case."""
     data = request.json
     case_id = data.get("case_id")
     if case_id in ALL_CASES:
@@ -79,15 +70,12 @@ def start_case():
         return jsonify({"success": True})
     return jsonify({"error": "Case not found"}), 404
 
-
 @app.route("/")
 def home():
     return render_template("index.html")
 
-
 @app.route("/api/state")
 def get_state():
-    # Enrich the unlocked evidence with full details so the frontend can render them
     detailed_evidence = []
     for ev_id in GAME_STATE["unlocked_evidence"]:
         for ev in CASE_BIBLE["evidence"]:
@@ -95,7 +83,6 @@ def get_state():
                 detailed_evidence.append(ev)
                 break
 
-    # Send the suspects list for the accusation dropdown
     suspects_list = [{"id": s["id"], "name": s["name"]} for s in CASE_BIBLE["suspects"]]
 
     return jsonify({
@@ -103,7 +90,6 @@ def get_state():
         "detailed_evidence": detailed_evidence,
         "suspects_list": suspects_list
     })
-
 
 @app.route("/api/suspects")
 def get_suspects():
@@ -118,7 +104,6 @@ def get_suspects():
         safe_suspects.append(safe_suspect)
     return jsonify(safe_suspects)
 
-
 @app.route("/api/case_info")
 def get_case_info():
     return jsonify({
@@ -128,9 +113,8 @@ def get_case_info():
         "location": CASE_BIBLE["victim"]["location"],
         "background": CASE_BIBLE["victim"]["background"],
         "case_summary": CASE_BIBLE["case_summary"],
-        "victim_relationships": CASE_BIBLE["victim"].get("victim_relationships", []) # NEW
+        "victim_relationships": CASE_BIBLE["victim"].get("victim_relationships", [])
     })
-
 
 @app.route("/api/interrogate", methods=["POST"])
 def interrogate():
@@ -145,12 +129,16 @@ def interrogate():
     if not suspect:
         return jsonify({"error": "Suspect not found"}), 404
 
-    # 1. Save the player's message to the game log
     GAME_STATE["chat_log"].append({"suspect_id": suspect_id, "role": "player", "text": player_message})
 
-    # 2. Initialize memory for this suspect if it's the first time talking to them
     if suspect_id not in GAME_STATE["suspect_chats"]:
         GAME_STATE["suspect_chats"][suspect_id] = []
+
+    # Find the EXACT statement_key this suspect is supposed to say if they lie
+    expected_statement = "none"
+    for c in CASE_BIBLE.get("contradictions", []):
+        if c["suspect_id"] == suspect_id:
+            expected_statement = c["statement_key"]
 
     system_prompt = f"""
     You are {suspect['name']}, the {suspect['role']}.
@@ -165,13 +153,12 @@ def interrogate():
     2. You are defensive, BUT if the detective presses you politely, you are willing to gossip about others.
     3. Keep dialogue short (1-3 sentences).
     4. NEVER say the 'statement_key' out loud. Speak naturally.
-    5. If you claim you were at your alibi location, set statement_key to match the game.
+    5. If the detective mentions anything about your alibi or asks where you were, you MUST set the statement_key to exactly '{expected_statement}'.
     """
 
     try:
         client = genai.Client(api_key=API_KEY, http_options={'api_version': 'v1beta'})
 
-        # 3. Build the conversation history for Gemini
         history = []
         for msg in GAME_STATE["suspect_chats"][suspect_id]:
             history.append(types.Content(role=msg["role"], parts=[types.Part.from_text(text=msg["text"])]))
@@ -179,7 +166,7 @@ def interrogate():
 
         response = client.models.generate_content(
             model='gemini-3.5-flash-lite',
-            contents=history,  # <-- Pass the whole memory to the AI!
+            contents=history,
             config=types.GenerateContentConfig(
                 system_instruction=system_prompt,
                 response_mime_type="application/json",
@@ -189,13 +176,11 @@ def interrogate():
         )
 
         ai_result = json.loads(response.text)
-
-        # 4. Save the AI's response to the logs
+        
         GAME_STATE["suspect_chats"][suspect_id].append({"role": "user", "text": player_message})
         GAME_STATE["suspect_chats"][suspect_id].append({"role": "model", "text": ai_result["dialogue"]})
         GAME_STATE["chat_log"].append({"suspect_id": suspect_id, "role": "suspect", "text": ai_result["dialogue"]})
 
-        # --- GAME ENGINE (Same as before) ---
         current_status = GAME_STATE["suspect_status"][suspect_id]
         current_status["trust"] = max(0, min(100, current_status["trust"] + ai_result["trust_delta"]))
         current_status["suspicion"] = max(0, min(100, current_status["suspicion"] + ai_result["suspicion_delta"]))
@@ -207,17 +192,15 @@ def interrogate():
         for contradiction in CASE_BIBLE.get("contradictions", []):
             if contradiction["suspect_id"] == suspect_id:
                 keywords = contradiction.get("player_must_say", [])
+                # Made the keyword matching more forgiving
                 player_presented_evidence = any(k in player_msg_lower for k in keywords)
 
-                if player_presented_evidence and (
-                        contradiction["statement_key"] in ai_statement or ai_statement in contradiction[
-                    "statement_key"]):
+                if player_presented_evidence and (contradiction["statement_key"] in ai_statement or ai_statement in contradiction["statement_key"] or ai_statement == expected_statement):
                     unlock_id = contradiction.get("unlocks_evidence")
                     if unlock_id and unlock_id not in GAME_STATE["unlocked_evidence"]:
                         GAME_STATE["unlocked_evidence"].append(unlock_id)
                         current_status["trust"] = max(0, current_status["trust"] + contradiction["trust_delta"])
-                        current_status["suspicion"] = min(100, current_status["suspicion"] + contradiction[
-                            "suspicion_delta"])
+                        current_status["suspicion"] = min(100, current_status["suspicion"] + contradiction["suspicion_delta"])
                         game_event = f"CONTRADICTION! Suspect caught in a lie. New evidence unlocked: {unlock_id}"
                         GAME_STATE["chat_log"].append({"suspect_id": "system", "role": "alert", "text": game_event})
                         break
@@ -235,24 +218,24 @@ def accuse():
     data = request.json
     accused_id = data.get("suspect_id")
 
-    # Check against the Case Bible solution
-    actual_murderer = CASE_BIBLE["solution"]["murderer_id"]
+    actual_murderer_id = CASE_BIBLE["solution"]["murderer_id"]
     required_evidence = CASE_BIBLE["solution"]["required_evidence"]
+    
+    # Get the actual murderer's name for the message
+    actual_murderer_name = next((s["name"] for s in CASE_BIBLE["suspects"] if s["id"] == actual_murderer_id), "Unknown")
 
-    # Check if the player has collected the required evidence
     has_evidence = all(ev in GAME_STATE["unlocked_evidence"] for ev in required_evidence)
 
-    if accused_id == actual_murderer and has_evidence:
+    if accused_id == actual_murderer_id and has_evidence:
         GAME_STATE["game_over"] = True
         GAME_STATE["player_won"] = True
-        return jsonify({"success": True, "message": "You solved the case! Sophia Blackwood did it."})
-    elif accused_id == actual_murderer and not has_evidence:
-        return jsonify({"success": False,
-                        "message": "You accused the right person, but you don't have enough evidence to convict them!"})
+        return jsonify({"success": True, "message": f"You solved the case! {actual_murderer_name} did it."})
+    elif accused_id == actual_murderer_id and not has_evidence:
+        return jsonify({"success": False, "message": "You accused the right person, but you don't have enough evidence to convict them!"})
     else:
         GAME_STATE["game_over"] = True
         GAME_STATE["player_won"] = False
-        return jsonify({"success": False, "message": "Wrong accusation! The real killer got away."})
+        return jsonify({"success": False, "message": f"Wrong accusation! {actual_murderer_name} got away with it."})
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
