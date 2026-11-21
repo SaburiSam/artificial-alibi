@@ -6,9 +6,31 @@
     <title>ARTIFICIAL ALIBI</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
+    <!-- HOME / LANDING SCREEN -->
+    <div id="home-modal" class="modal">
+        <div class="modal-content home-content">
+            <h1 class="home-title">THE DECEPTION ENGINE</h1>
+            <p class="home-subtitle">An AI-Powered Detective Experience</p>
+            
+            <hr>
+            
+            <p class="home-description">
+                Welcome, Detective. You are about to enter a world of lies, secrets, and murder. 
+                The suspects you will interrogate are driven by advanced AI. They will lie to you, 
+                deflect blame, and remember everything you say. 
+                <br><br>
+                To solve the case, you must cross-reference their statements with the evidence board, 
+                catch them in contradictions, and make the final accusation. Choose your questions wisely.
+            </p>
+            
+            <button onclick="enterMainMenu()" class="start-btn home-start-btn">Start Investigation</button>
+        </div>
+    </div>
+    
 <body>
     <!-- CASE SELECTION SCREEN -->
-    <div id="main-menu" class="modal">
+    <div id="main-menu" class="modal" style="display: none;">
         <div class="modal-content">
             <h2>The Deception Engine</h2>
             <h3>Select an Investigation</h3>
